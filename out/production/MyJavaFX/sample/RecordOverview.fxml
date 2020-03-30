@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="370.0" prefWidth="760.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.RecordOverviewController">
+   <children>
+      <TableView fx:id="tableView" layoutX="100.0" layoutY="551.0" prefHeight="308.0" prefWidth="786.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columns>
+          <TableColumn fx:id="c1" prefWidth="75.0" text="c1" />
+          <TableColumn fx:id="c2" prefWidth="75.0" text="c2" />
+            <TableColumn fx:id="c3" prefWidth="75.0" text="c3" />
+            <TableColumn fx:id="c4" prefWidth="75.0" text="c4" />
+            <TableColumn fx:id="c5" prefWidth="75.0" text="c5" />
+            <TableColumn fx:id="c6" prefWidth="75.0" text="c6" />
+            <TableColumn fx:id="c7" prefWidth="75.0" text="c7" />
+            <TableColumn fx:id="c8" prefWidth="75.0" text="c8" />
+            <TableColumn fx:id="c9" prefWidth="75.0" text="c9" />
+            <TableColumn fx:id="c10" prefWidth="75.0" text="c10" />
+        </columns>
+      </TableView>
+      <Button fx:id="btnLoadImage" layoutX="322.0" layoutY="312.0" mnemonicParsing="false" onAction="#handleLoadImage" prefHeight="42.0" prefWidth="117.0" text="Load Image" AnchorPane.bottomAnchor="15.0" />
+   </children>
+</AnchorPane>
