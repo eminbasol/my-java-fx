@@ -285,7 +285,6 @@ public class RecordOverviewController {
 
     @FXML
     private void handleLoadImage() {
-        btnLoadImage.setOnAction(event -> {
             try {
                 Parent rootNode = FXMLLoader.load(getClass().getResource("LoadImage.fxml"));
                 Stage stage = new Stage();
@@ -297,7 +296,6 @@ public class RecordOverviewController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
     }
 
 }
