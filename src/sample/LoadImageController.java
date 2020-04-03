@@ -1,21 +1,34 @@
 package sample;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class LoadImageController {
 
@@ -30,7 +43,7 @@ public class LoadImageController {
     private Button btnCancel;
 
     @FXML
-    private ImageView imageView;
+    public ImageView imageView;
 
     @FXML
     private Pane p;
@@ -38,10 +51,25 @@ public class LoadImageController {
     @FXML
     private Canvas canvas;
 
+    @FXML
+    Label lblPass;
+
+
     ArrayList list = new ArrayList();
 
+    public void setLblPass (String text ) {
+
+        lblPass.setText(text);
+        Image image = new Image( "file:"+lblPass.getText());
+        imageView.setImage(image);
+    }
+
+
+
     @FXML
-    void initialize() {
+    void initialize() throws Exception {
+
+
 
         p.getChildren().add(canvas);
         GraphicsContext aPen = canvas.getGraphicsContext2D();
@@ -60,11 +88,11 @@ public class LoadImageController {
         });
 
 
-       p.setOnMouseClicked(new EventHandler<MouseEvent>() {  // mouseClick koordinatları
+        p.setOnMouseClicked(new EventHandler<MouseEvent>() {  // mouseClick koordinatları
             @Override
             public void handle(MouseEvent event) {
-                System.out.println("X:"+event.getSceneX());
-                System.out.println("Y:"+event.getSceneY());
+                System.out.println("X:" + event.getSceneX());
+                System.out.println("Y:" + event.getSceneY());
                 list.add(event.getSceneX());
                 list.add(event.getSceneY());
 
@@ -75,13 +103,11 @@ public class LoadImageController {
         });
     }
 
-
-
     @FXML
-    private void handleCancel(){
+    private void handleCancel() {
         btnCancel.setOnAction(actionEvent ->
         {
-            Stage stage = (Stage)btnCancel.getScene().getWindow();
+            Stage stage = (Stage) btnCancel.getScene().getWindow();
             stage.close();
         });
     }

@@ -1,24 +1,37 @@
 package sample;
 
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class RecordOverviewController {
@@ -76,9 +89,6 @@ public class RecordOverviewController {
     private TextField txtFileName;
 
     @FXML
-    private ListView listView;
-
-    @FXML
     private CheckBox boxId;
 
     @FXML
@@ -93,11 +103,24 @@ public class RecordOverviewController {
     @FXML
     private TextField srcInput;
 
+    @FXML
+    private ListView<String> listView;
+
+
+    @FXML
+    private VBox vBox;
+
+    @FXML
+    private TextField txtPath;
+
+    @FXML
+    private TextField txtImageName;
+
+
 
     FileChooser fc = new FileChooser();
 
     public ObservableList<Record> data;
-
 
     @FXML
     void btnUpdateClick(ActionEvent event) {
@@ -182,6 +205,7 @@ public class RecordOverviewController {
             srcInput.setText(file.getAbsolutePath());
         }
         scan.close();
+
     }
 
 
@@ -284,21 +308,70 @@ public class RecordOverviewController {
     }
 
     @FXML
-    private void handleLoadImage() {
+    private void btnLoadImageClick() {
+        if (data == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("CSV Dosyası Seçiniz");
+            alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz CSV Dosyasını Seçiniz");
+            alert.setContentText("Kayıtlar seçtiğiniz CSV dosyasına kaydedilecek");
+
+            alert.showAndWait();
+        } else {
+            List<File> selectedFiles = fc.showOpenMultipleDialog(null);
+            if (selectedFiles != null) {
+                for (int i = 0; i < selectedFiles.size(); i++) {
+                    listView.getItems().add(selectedFiles.get(i).getAbsolutePath());
+                    txtPath.setText(selectedFiles.get(i).getAbsolutePath());
+                    txtImageName.setText(selectedFiles.get(i).getAbsolutePath());
+
+                    listView.getSelectionModel().selectedItemProperty().addListener(
+                            new ChangeListener<String>() {
+                                public void changed(ObservableValue<? extends String> ov,
+                                                    String old_val, String new_val) {
+                                    txtImageName.setText(new_val);
+                                    txtPath.setText(new_val);
+                                }
+                            });
+                }
+            } else {
+                System.out.println("File is not Valid");
+            }
+        }
+    }
+
+    @FXML
+    public void listViewImageClick(MouseEvent click) {
+
+        if (click.getClickCount() == 2) {
+
             try {
-                Parent rootNode = FXMLLoader.load(getClass().getResource("LoadImage.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("LoadImage.fxml"));
+                Parent rootNode = loader.load();
+
+                LoadImageController loadImageController = loader.getController();
+                loadImageController.setLblPass(txtPath.getText());
                 Stage stage = new Stage();
-                stage.setTitle("Image");
+                stage.setTitle(txtImageName.getText());
                 Scene scene = new Scene(rootNode);
                 stage.setScene(scene);
 
                 stage.showAndWait();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-    }
 
+            }
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
 
 
 

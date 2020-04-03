@@ -13,13 +13,18 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="665.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.RecordOverviewController">
    <children>
-      <SplitPane dividerPositions="0.2895927601809955" layoutX="176.0" prefHeight="519.0" prefWidth="466.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.2609351432880845" layoutX="176.0" prefHeight="519.0" prefWidth="466.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="418.0" prefWidth="178.0" style="-fx-background-color: #cecece;">
+            <AnchorPane fx:id="rootNode" prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <ListView fx:id="listView" layoutX="-31.0" layoutY="128.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #cecece;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children>
-            </AnchorPane>
+                  <TextField fx:id="txtPath" editable="false" visible="false" />
+                  <VBox fx:id="vBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <ListView fx:id="listView" onMouseClicked="#listViewImageClick" prefHeight="416.0" prefWidth="200.0" />
+                        <TextField fx:id="txtImageName" editable="false" style="-fx-background-color: #cecece;" />
+                     </children>
+                  </VBox>
+               </children></AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
                   <VBox prefHeight="493.0" prefWidth="783.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -48,10 +53,10 @@
                         <TextField fx:id="txtX" prefHeight="25.0" prefWidth="304.0" promptText="X" />
                         <TextField fx:id="txtY" prefHeight="25.0" prefWidth="304.0" promptText="Y" />
                         <TextField fx:id="srcInput" editable="false" prefHeight="25.0" prefWidth="304.0" style="-fx-background-color: #cecece;" />
-                        <HBox prefHeight="31.0" prefWidth="401.0">
+                        <HBox>
                            <children>
+                              <Button fx:id="btnLoadImage" mnemonicParsing="false" onAction="#btnLoadImageClick" prefHeight="75.0" prefWidth="85.0" text="Load Images" />
                               <Button fx:id="btnLoadCsv" mnemonicParsing="false" onAction="#btnLoadCsvClick" prefHeight="75.0" prefWidth="80.0" text="Load CSV" />
-                              <Button fx:id="btnLoadImage" mnemonicParsing="false" onAction="#handleLoadImage" prefHeight="75.0" prefWidth="80.0" text="Load Image" />
                               <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#btnAddClick" prefHeight="75.0" prefWidth="80.0" text="Add" />
                               <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDeleteClick" prefHeight="75.0" prefWidth="80.0" text="Delete" />
                               <Button fx:id="btnUpdate" mnemonicParsing="false" onAction="#btnUpdateClick" prefHeight="75.0" prefWidth="80.0" text="Update" />
