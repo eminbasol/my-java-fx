@@ -15,7 +15,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("RecordOverview.fxml"));
         primaryStage.setTitle("ReadCSV");
-        primaryStage.setScene(new Scene(root, 665, 420));
+        primaryStage.setScene(new Scene(root, 1200, 420));
         primaryStage.show();
     }
 

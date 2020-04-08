@@ -7,31 +7,39 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="665.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.RecordOverviewController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.RecordOverviewController">
    <children>
-      <SplitPane dividerPositions="0.2609351432880845" layoutX="176.0" prefHeight="519.0" prefWidth="466.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.18363939899833054, 0.6001669449081803" layoutX="176.0" prefHeight="420.0" prefWidth="1148.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-            <AnchorPane fx:id="rootNode" prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane fx:id="rootNode" prefHeight="150.0" prefWidth="200.0">
                <children>
+                  <ListView fx:id="imageViewFileName" disable="true" onMouseClicked="#listViewImageClick" prefHeight="200.0" prefWidth="200.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                   <TextField fx:id="txtPath" editable="false" visible="false" />
                   <VBox fx:id="vBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <ListView fx:id="listView" onMouseClicked="#listViewImageClick" prefHeight="416.0" prefWidth="200.0" />
+                        <ListView fx:id="listView" onMouseClicked="#listViewImageClick" prefHeight="416.0" prefWidth="150.0" />
                         <TextField fx:id="txtImageName" editable="false" style="-fx-background-color: #cecece;" />
                      </children>
                   </VBox>
                </children></AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <Pane fx:id="pane" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <ImageView fx:id="imageView" fitHeight="275.0" fitWidth="371.0" onMouseClicked="#imageViewOnMouseClicked" onMouseDragged="#imageViewOnMouseDragged" onMousePressed="#imageViewOnMousePressed" onScroll="#imageViewOnScroll" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Pane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="418.0" prefWidth="491.0">
                <children>
                   <VBox prefHeight="493.0" prefWidth="783.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <TableView fx:id="tableView" prefHeight="294.0" prefWidth="452.0">
+                        <TableView fx:id="tableView" prefHeight="353.0" prefWidth="474.0">
                           <columns>
-                            <TableColumn fx:id="ıdColumn" prefWidth="75.0" text="ID" />
+                            <TableColumn fx:id="ıdColumn" prefWidth="75.0" sortable="false" text="ID" />
                             <TableColumn fx:id="fileNameColumn" prefWidth="75.0" text="File Name" />
                               <TableColumn prefWidth="75.0" text="X" fx:id="xColumn" />
                               <TableColumn fx:id="yColumn" prefWidth="75.0" text="Y" />
@@ -48,7 +56,7 @@
                               <CheckBox fx:id="boxY" mnemonicParsing="false" prefHeight="20.0" prefWidth="120.0" selected="true" text="Y" />
                            </children>
                         </HBox>
-                        <TextField fx:id="txtId" promptText="ID" />
+                        <TextField fx:id="search" disable="true" editable="false" promptText="Filter" />
                         <TextField fx:id="txtFileName" promptText="File Name" />
                         <TextField fx:id="txtX" prefHeight="25.0" prefWidth="304.0" promptText="X" />
                         <TextField fx:id="txtY" prefHeight="25.0" prefWidth="304.0" promptText="Y" />

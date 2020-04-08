@@ -1,3 +1,4 @@
+/*
 package sample;
 
 import javafx.collections.FXCollections;
@@ -22,12 +23,15 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class LoadImageController {
@@ -43,7 +47,7 @@ public class LoadImageController {
     private Button btnCancel;
 
     @FXML
-    public ImageView imageView;
+    private ImageView imageView;
 
     @FXML
     private Pane p;
@@ -57,7 +61,7 @@ public class LoadImageController {
 
     ArrayList list = new ArrayList();
 
-    public void setLblPass (String text ) {
+    public void setLblPass (String text, String name ) {
 
         lblPass.setText(text);
         Image image = new Image( "file:"+lblPass.getText());
@@ -67,9 +71,7 @@ public class LoadImageController {
 
 
     @FXML
-    void initialize() throws Exception {
-
-
+    void initialize()  {
 
         p.getChildren().add(canvas);
         GraphicsContext aPen = canvas.getGraphicsContext2D();
@@ -77,8 +79,10 @@ public class LoadImageController {
         aPen.setFill(Color.YELLOW);
         canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent mouseEvent) {
-                /*aPen.setFont(Font.font ("Arial", 40));
-                aPen.strokeText(".", mouseEvent.getX(), mouseEvent.getY());*/
+                */
+/*aPen.setFont(Font.font ("Arial", 40));
+                aPen.strokeText(".", mouseEvent.getX(), mouseEvent.getY());*//*
+
                 aPen.setStroke(Color.BLACK);
                 aPen.setFill(Color.YELLOW);
                 aPen.setFont(Font.font("Stencil", 40));
@@ -97,10 +101,12 @@ public class LoadImageController {
                 list.add(event.getSceneY());
 
                 System.out.println(list);
-            }
 
 
-        });
+
+
+
+        })
     }
 
     @FXML
@@ -114,3 +120,4 @@ public class LoadImageController {
 }
 
 
+*/
