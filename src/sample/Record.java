@@ -11,8 +11,9 @@ public class Record {
     private final StringProperty x = new SimpleStringProperty(this, "x", null);
     private final StringProperty y = new SimpleStringProperty(this, "y", null);
 
+
     public Record() {
-        this( null, null, null);
+        this(null, null, null);
     }
 
     public Record(String fileName, String x, String y) {
@@ -24,6 +25,7 @@ public class Record {
     public final String getFileName() {//2
         return fileName.get();
     }
+
     public final void setFileName(String fileName) {//2
         fileNameProperty().set(fileName);
     }
@@ -35,15 +37,19 @@ public class Record {
     public final String getX() {//3
         return x.get();
     }
+
     public final void setX(String x) {//3
         xProperty().set(x);
     }
 
-    public final StringProperty xProperty() { return x; }
+    public final StringProperty xProperty() {
+        return x;
+    }
 
     public final String getY() {
         return y.get();
     }
+
     public final void setY(String y) {
         yProperty().set(y);
     }
@@ -51,6 +57,7 @@ public class Record {
     public final StringProperty yProperty() {
         return y;
     }
+
 }
 
 

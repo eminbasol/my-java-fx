@@ -8,8 +8,11 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,8 +21,10 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.*;
@@ -99,7 +104,7 @@ public class RecordOverviewController {
     private ListView<String> listView;
 
     @FXML
-    private VBox vBox;
+    private VBox vBox, vBoxSlider;
 
     @FXML
     private TextField txtPath;
@@ -115,6 +120,18 @@ public class RecordOverviewController {
 
     @FXML
     private Pane pane;
+
+    @FXML
+    private Label lblY1;
+
+    @FXML
+    private Label lblX1;
+
+    @FXML
+    private Slider slider;
+
+    @FXML
+    private Button btnZoom, btnAnaliz;
 
 
     ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
@@ -139,19 +156,48 @@ public class RecordOverviewController {
 
         tableView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showRecordInTextFields(newValue));
+
     }
 
     @FXML
     void btnUpdateClick(ActionEvent event) {
         int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
         Record record1 = new Record(txtFileName.getText(), txtX.getText(), txtY.getText());
-        if (selectedIndex >=0) {
+        if (selectedIndex >= 0) {
             if (filteredList == null) {
                 tableView.getItems().set(selectedIndex, record1);
             } else {
                 int sourceIndex = filteredList.getSourceIndexFor(data, selectedIndex);
-                data.set(sourceIndex,record1);
+                data.set(sourceIndex, record1);
+
+                pane.getChildren().clear();
+                pane.getChildren().add(imageView);
+
+                TableColumn<Record, String> column1 = xColumn;
+                List<String> xSutun = new ArrayList<>();
+                for (Record item : tableView.getItems()) {
+                    xSutun.add(column1.getCellObservableValue(item).getValue());
+                }
+                TableColumn<Record, String> column2 = yColumn;
+                List<String> ySutun = new ArrayList<>();
+                for (Record item : tableView.getItems()) {
+                    ySutun.add(column2.getCellObservableValue(item).getValue());
+                }
+                for (int j = 0; j < xSutun.size(); j++) {
+                    Circle spot = new Circle(3);
+                    spot.setFill(Color.RED);
+                    spot.setCenterX(1.0f);
+                    spot.setCenterY(1.0f);
+
+                    spot.setLayoutX(Double.parseDouble(xSutun.get(j)));
+                    spot.setLayoutY(Double.parseDouble(ySutun.get(j)));
+
+                    pane.getChildren().add(spot);
+
+                }
+
             }
+
 
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -186,6 +232,35 @@ public class RecordOverviewController {
             } else {
                 int sourceIndex = filteredList.getSourceIndexFor(data, selectedIndex);
                 data.remove(sourceIndex);
+                if (filteredList != null) {
+                    pane.getChildren().clear();
+                    pane.getChildren().add(imageView);
+                    pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
+                    TableColumn<Record, String> column1 = xColumn;
+                    List<String> xSutun = new ArrayList<>();
+                    for (Record item : tableView.getItems()) {
+                        xSutun.add(column1.getCellObservableValue(item).getValue());
+                    }
+                    TableColumn<Record, String> column2 = yColumn;
+                    List<String> ySutun = new ArrayList<>();
+                    for (Record item : tableView.getItems()) {
+                        ySutun.add(column2.getCellObservableValue(item).getValue());
+                    }
+                    for (int j = 0; j < xSutun.size(); j++) {
+                        Circle spot = new Circle(3);
+                        spot.setFill(Color.RED);
+                        spot.setCenterX(1.0f);
+                        spot.setCenterY(1.0f);
+
+                        spot.setLayoutX(Double.parseDouble(xSutun.get(j)));
+                        spot.setLayoutY(Double.parseDouble(ySutun.get(j)));
+
+                        pane.getChildren().add(spot);
+                        lblX1.setText("");
+                        lblY1.setText("");
+
+                    }
+                }
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -255,7 +330,6 @@ public class RecordOverviewController {
 
         Writer writer = null;
         try {
-
             writer = new BufferedWriter(new FileWriter(file));
             for (Record record : data) {
 
@@ -285,7 +359,26 @@ public class RecordOverviewController {
     private void btnAddClick(ActionEvent event) {
         if (data != null) {
             if (isInputValid()) {
-                data.add(new Record(txtFileName.getText(), txtX.getText(), txtY.getText()));
+                Circle spot = new Circle(3);
+                spot.setFill(Color.RED);
+                spot.setCenterX(1.0f);
+                spot.setCenterY(1.0f);
+
+                spot.setLayoutX(Double.parseDouble(txtX.getText()));
+                spot.setLayoutY(Double.parseDouble(txtY.getText()));
+
+                pane.getChildren().add(spot);
+                pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
+
+                String x = String.valueOf(txtX.getText());
+                String y = String.valueOf(txtY.getText());
+                String fileName = txtImageName.getText();
+                String[] test = fileName.split("/");
+                fileName = test[(test.length) - 1];
+
+                data.add(new Record(fileName, x, y));
+
+                tableView.setItems(filteredList);
 
                 txtFileName.clear();
                 txtY.clear();
@@ -407,6 +500,9 @@ public class RecordOverviewController {
 
         pane.getChildren().clear();
         pane.getChildren().add(imageView);
+        pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
+        lblX1.setText("");
+        lblY1.setText("");
 
         String fileName = txtImageName.getText();
         String[] test = fileName.split("/");
@@ -426,12 +522,32 @@ public class RecordOverviewController {
                 return false;
             });
         });
-
         tableView.setItems(filteredList);
+        if (filteredList != null) {
+            TableColumn<Record, String> column1 = xColumn;
+            List<String> xSutun = new ArrayList<>();
+            for (Record item : tableView.getItems()) {
+                xSutun.add(column1.getCellObservableValue(item).getValue());
+            }
+            TableColumn<Record, String> column2 = yColumn;
+            List<String> ySutun = new ArrayList<>();
+            for (Record item : tableView.getItems()) {
+                ySutun.add(column2.getCellObservableValue(item).getValue());
+            }
+            for (int j = 0; j < xSutun.size(); j++) {
+                Circle spot = new Circle(3);
+                spot.setFill(Color.RED);
+                spot.setCenterX(1.0f);
+                spot.setCenterY(1.0f);
 
+                spot.setLayoutX(Double.parseDouble(xSutun.get(j)));
+                spot.setLayoutY(Double.parseDouble(ySutun.get(j)));
 
+                pane.getChildren().add(spot);
+            }
+
+        }
     }
-
 
     private void reset(ImageView imageView, double width, double height) {
         imageView.setViewport(new Rectangle2D(0, 0, width, height));
@@ -462,9 +578,8 @@ public class RecordOverviewController {
             spot.setCenterX(1.0f);
             spot.setCenterY(1.0f);
 
-            //çemberin farenin tıklandığı yerde gözükmesi için, kaydederken orjinal noktalar kaydediliyor
-            spot.setLayoutX(e.getX() - 3);
-            spot.setLayoutY(e.getY() - 3);
+            spot.setLayoutX(e.getX());
+            spot.setLayoutY(e.getY());
 
             pane.getChildren().add(spot);
 
@@ -481,9 +596,28 @@ public class RecordOverviewController {
             fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
             xColumn.setCellValueFactory(cellData -> cellData.getValue().xProperty());
             yColumn.setCellValueFactory(cellData -> cellData.getValue().yProperty());
-        }
-    }
 
+            double initX = e.getX();
+            double initY = e.getY();
+
+            if (lblX1.getText() != "" && lblY1.getText() != "") {
+                Line line = new Line();
+                line.setStartX(Double.parseDouble(lblX1.getText()));
+                line.setStartY(Double.parseDouble(lblY1.getText()));
+                line.setEndX(e.getX());
+                line.setEndY(e.getY());
+                line.setFill(null);
+                line.setStroke(Color.RED);
+                line.setStrokeWidth(2);
+                pane.getChildren().add(line);
+            }
+            lblX1.setText(String.valueOf(initX));
+            lblY1.setText(String.valueOf(initY));
+            System.out.println(lblX1.getText());
+            System.out.println(lblY1.getText());
+        }
+
+    }
 
     @FXML
     void imageViewOnMouseDragged(MouseEvent event) {
@@ -565,6 +699,58 @@ public class RecordOverviewController {
                     0, height - newHeight);
 
             imageView.setViewport(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
+        }
+    }
+
+    @FXML
+    void btnZoomClick(ActionEvent event) {
+        imageView.setImage(null);
+        Image image = new Image("file:" + txtPath.getText());
+        imageView.setImage(image);
+
+
+        imageView.scaleXProperty().bind(slider.valueProperty());
+        imageView.scaleYProperty().bind(slider.valueProperty());
+
+
+        imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
+
+    }
+
+    @FXML
+    private void btnAnalizClick(ActionEvent event) {
+        if (data == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("CSV Dosyası Seçiniz");
+            alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz CSV Dosyasını Seçiniz");
+            alert.setContentText("Kayıtlar seçtiğiniz CSV dosyasından alınacak.");
+
+            alert.showAndWait();
+
+
+        }else if(filteredList == null){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Herhangi Bir Kayıt Yok");
+            alert.setHeaderText("Lütfen Önce Resim Üzerine Tıklayarak Nokta Ekleyiniz");
+            alert.setContentText("Kayıtlar tablodan alınacak.");
+
+            alert.showAndWait();
+
+        }
+        else {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("Analiz.fxml"));
+                Parent root1 = loader.load();
+
+                AnalizController analizController = loader.getController();
+                analizController.setData(filteredList);
+
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root1, 300, 300));
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
