@@ -25,12 +25,13 @@
                   <TextField fx:id="txtPath" editable="false" visible="false" />
                   <VBox fx:id="vBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
+                        <Button fx:id="btnShowAll" mnemonicParsing="false" onAction="#btnShowAllClick" prefHeight="25.0" prefWidth="216.0" text="Show All Landmarkings" />
                         <ListView fx:id="listView" onMouseClicked="#listViewImageClick" prefHeight="416.0" prefWidth="150.0" />
                         <TextField fx:id="txtImageName" editable="false" style="-fx-background-color: #cecece;" />
                      </children>
                   </VBox>
                </children></AnchorPane>
-            <Pane fx:id="pane" prefHeight="200.0" prefWidth="200.0">
+            <Pane fx:id="pane">
                <children>
                   <ImageView fx:id="imageView" fitHeight="275.0" fitWidth="371.0" onMouseClicked="#imageViewOnMouseClicked" onMouseDragged="#imageViewOnMouseDragged" onMousePressed="#imageViewOnMousePressed" onScroll="#imageViewOnScroll" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="lblX1" layoutX="413.0" layoutY="384.0" />

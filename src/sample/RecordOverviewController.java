@@ -14,6 +14,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -27,12 +30,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class RecordOverviewController {
@@ -65,7 +74,7 @@ public class RecordOverviewController {
     private Button btnLoadImage;
 
     @FXML
-    private Button btnSave;
+    private Button btnSave , btnShowAll;
 
     @FXML
     private Button btnAdd;
@@ -157,6 +166,15 @@ public class RecordOverviewController {
         tableView.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showRecordInTextFields(newValue));
 
+
+        data = FXCollections.observableArrayList();
+        ıdColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Record, Number>, ObservableValue<Number>>() {
+            @Override
+            public ObservableValue<Number> call(TableColumn.CellDataFeatures<Record, Number> recordNumberCellDataFeatures) {
+                return new ReadOnlyObjectWrapper(tableView.getItems().indexOf(recordNumberCellDataFeatures.getValue()) + "");
+            }
+
+        });
     }
 
     @FXML
@@ -284,38 +302,38 @@ public class RecordOverviewController {
 
         if (file == null) {
             return;
+        } else {
+            data.clear();
+            Path dirP = Paths.get(String.valueOf(file));
+            InputStream in = Files.newInputStream(dirP);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+            Scanner scan = new Scanner(reader);
+            scan.useDelimiter("\\s*,\\s*");
+
+            while (scan.hasNext()) {
+                String fileName = scan.next();
+                String x = scan.next();
+                String y = scan.next();
+
+                data.add(new Record(fileName, x, y));
+                tableView.setItems(data);
+
+                ıdColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Record, Number>, ObservableValue<Number>>() {
+                    @Override
+                    public ObservableValue<Number> call(TableColumn.CellDataFeatures<Record, Number> recordNumberCellDataFeatures) {
+                        return new ReadOnlyObjectWrapper(tableView.getItems().indexOf(recordNumberCellDataFeatures.getValue()) + "");
+                    }
+
+                });
+                fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
+                xColumn.setCellValueFactory(cellData -> cellData.getValue().xProperty());
+                yColumn.setCellValueFactory(cellData -> cellData.getValue().yProperty());
+                srcInput.setText(file.getAbsolutePath());
+
+            }
+            scan.close();
         }
-
-        Path dirP = Paths.get(String.valueOf(file));
-        InputStream in = Files.newInputStream(dirP);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-        Scanner scan = new Scanner(reader);
-        scan.useDelimiter("\\s*,\\s*");
-
-        while (scan.hasNext()) {
-            String fileName = scan.next();
-            String x = scan.next();
-            String y = scan.next();
-
-            data.add(new Record(fileName, x, y));
-            tableView.setItems(data);
-
-            ıdColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Record, Number>, ObservableValue<Number>>() {
-                @Override
-                public ObservableValue<Number> call(TableColumn.CellDataFeatures<Record, Number> recordNumberCellDataFeatures) {
-                    return new ReadOnlyObjectWrapper(tableView.getItems().indexOf(recordNumberCellDataFeatures.getValue()) + "");
-                }
-
-            });
-            fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
-            xColumn.setCellValueFactory(cellData -> cellData.getValue().xProperty());
-            yColumn.setCellValueFactory(cellData -> cellData.getValue().yProperty());
-            srcInput.setText(file.getAbsolutePath());
-
-        }
-        scan.close();
-
     }
 
     @FXML
@@ -326,10 +344,23 @@ public class RecordOverviewController {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV", "*.csv"),
                 new FileChooser.ExtensionFilter("Text", "*.txt"));
+
+        DateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH-mm");
+        Date date = new Date();
+        String currentDate = dateFormat.format(date);
+        String format = "tmp_" + currentDate + ".csv";
+
+        String defaultSaveName = format;
+        fileChooser.setInitialFileName(defaultSaveName);
         File file = fileChooser.showSaveDialog(null);
 
         Writer writer = null;
         try {
+            if (file != null)
+            {
+                File dir = file.getParentFile();
+                fileChooser.setInitialDirectory(dir);
+            }
             writer = new BufferedWriter(new FileWriter(file));
             for (Record record : data) {
 
@@ -357,43 +388,35 @@ public class RecordOverviewController {
 
     @FXML
     private void btnAddClick(ActionEvent event) {
-        if (data != null) {
-            if (isInputValid()) {
-                Circle spot = new Circle(3);
-                spot.setFill(Color.RED);
-                spot.setCenterX(1.0f);
-                spot.setCenterY(1.0f);
 
-                spot.setLayoutX(Double.parseDouble(txtX.getText()));
-                spot.setLayoutY(Double.parseDouble(txtY.getText()));
+        if (isInputValid()) {
+            Circle spot = new Circle(3);
+            spot.setFill(Color.RED);
+            spot.setCenterX(1.0f);
+            spot.setCenterY(1.0f);
 
-                pane.getChildren().add(spot);
-                pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
+            spot.setLayoutX(Double.parseDouble(txtX.getText()));
+            spot.setLayoutY(Double.parseDouble(txtY.getText()));
 
-                String x = String.valueOf(txtX.getText());
-                String y = String.valueOf(txtY.getText());
-                String fileName = txtImageName.getText();
-                String[] test = fileName.split("/");
-                fileName = test[(test.length) - 1];
+            pane.getChildren().add(spot);
+            pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
 
-                data.add(new Record(fileName, x, y));
+            String x = String.valueOf(txtX.getText());
+            String y = String.valueOf(txtY.getText());
+            String fileName = txtImageName.getText();
+            String[] test = fileName.split("/");
+            fileName = test[(test.length) - 1];
 
-                tableView.setItems(filteredList);
+            data.add(new Record(fileName, x, y));
 
-                txtFileName.clear();
-                txtY.clear();
-                txtX.clear();
+            tableView.setItems(filteredList);
 
-            }
-        } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("CSV Dosyası Seçiniz");
-            alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz CSV Dosyasını Seçiniz");
-            alert.setContentText("Kayıtlar seçtiğiniz CSV dosyasına kaydedilecek");
-
-            alert.showAndWait();
+            txtFileName.clear();
+            txtY.clear();
+            txtX.clear();
 
         }
+
     }
 
     private boolean isInputValid() {
@@ -425,75 +448,74 @@ public class RecordOverviewController {
     }
 
     @FXML
-    private void btnLoadImageClick() {
-        if (data == null) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("CSV Dosyası Seçiniz");
-            alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz CSV Dosyasını Seçiniz");
-            alert.setContentText("Kayıtlar seçtiğiniz CSV dosyasına kaydedilecek");
+    private void btnLoadImageClick() throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Load Image File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image", "*.jpg", "*.jpeg", "*.png", "*.tif", "*.gif"));
 
-            alert.showAndWait();
-        } else {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Load Image File");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image", "*.jpg", "*.jpeg", "*.png", "*.tif", "*.gif"));
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
 
-            List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
+        String fileName = txtImageName.getText();
+        String[] test = fileName.split("/");
+        fileName = test[(test.length) - 1];
+        search.setText(fileName);
 
-            String fileName = txtImageName.getText();
-            String[] test = fileName.split("/");
-            fileName = test[(test.length) - 1];
-            search.setText(fileName);
+        search.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredList = new FilteredList(data, e -> true);
 
-            search.textProperty().addListener((observable, oldValue, newValue) -> {
-                filteredList = new FilteredList(data, e -> true);
+            filteredList.setPredicate((Predicate<? super Record>) (Record record) -> {
 
-                filteredList.setPredicate((Predicate<? super Record>) (Record record) -> {
-
-                    if (newValue.isEmpty() || newValue == null) {
-                        return true;
-                    } else if (record.getFileName().contains(newValue)) {
-                        return true;
-                    }
-                    return false;
-                });
-            });
-
-            if (selectedFiles != null) {
-                for (int i = 0; i < selectedFiles.size(); i++) {
-
-                    listView.getItems().add(selectedFiles.get(i).getAbsolutePath());
-
-                    listView.getSelectionModel().selectedItemProperty().addListener(
-                            new ChangeListener<String>() {
-                                public void changed(ObservableValue<? extends String> ov,
-                                                    String old_val, String new_val) {
-
-                                    txtImageName.setText(new_val);
-                                    txtPath.setText(new_val);
-
-                                }
-                            });
+                if (newValue.isEmpty() || newValue == null) {
+                    return true;
+                } else if (record.getFileName().contains(newValue)) {
+                    return true;
                 }
-            } else {
-                System.out.println("File is not Valid");
+                return false;
+            });
+        });
+
+        if (selectedFiles != null) {
+            for (int i = 0; i < selectedFiles.size(); i++) {
+
+                listView.getItems().add(selectedFiles.get(i).getAbsolutePath());
+
+                listView.getSelectionModel().selectedItemProperty().addListener(
+                        new ChangeListener<String>() {
+                            public void changed(ObservableValue<? extends String> ov,
+                                                String old_val, String new_val) {
+
+                                txtImageName.setText(new_val);
+                                txtPath.setText(new_val);
+
+                            }
+                        });
             }
+        } else {
+            System.out.println("File is not Valid");
         }
+
+        listView.getSelectionModel().select(0);
+        listViewImageClick();
     }
 
-    @FXML
-    public void listViewImageClick(MouseEvent click) {
-
+    private void listViewImageClick() throws IOException {
         imageView.setImage(null);
-        Image image = new Image("file:" + txtPath.getText());
+        int scaledWidth = 800;
+        int scaledHeight = 600;
+
+        String outputPath = txtPath.getText().substring(0,txtPath.getText().indexOf("."));
+        String format = txtPath.getText().substring(txtPath.getText().lastIndexOf("."));
+
+        RecordOverviewController.resize(txtPath.getText(), outputPath+"_resized_800x600"+format, scaledWidth, scaledHeight);
+
+        Image image = new Image("file:" +outputPath+"_resized_800x600"+format);
         imageView.setImage(image);
 
         double width = image.getWidth();
         double height = image.getHeight();
 
-        reset(imageView, width / 2, height / 2);
-
+        reset(imageView, width, height);
 
         imageView.fitWidthProperty().bind(pane.widthProperty());
         imageView.fitHeightProperty().bind(pane.heightProperty());
@@ -549,22 +571,41 @@ public class RecordOverviewController {
         }
     }
 
+
+    @FXML
+    public void listViewImageClick(MouseEvent click) throws IOException {
+        listViewImageClick();
+}
+
+    public static void resize(String inputImagePath,
+                              String outputImagePath, int scaledWidth, int scaledHeight)
+            throws IOException {
+
+        File inputFile = new File(inputImagePath);
+        BufferedImage inputImage = ImageIO.read(inputFile);
+
+        BufferedImage outputImage = new BufferedImage(scaledWidth,
+                scaledHeight, inputImage.getType());
+
+        Graphics2D g2d = outputImage.createGraphics();
+        g2d.drawImage(inputImage, 0, 0, scaledWidth, scaledHeight, null);
+        g2d.dispose();
+
+        String formatName = outputImagePath.substring(outputImagePath
+                .lastIndexOf(".") + 1);
+
+        ImageIO.write(outputImage, formatName, new File(outputImagePath));
+    }
+
+
+
     private void reset(ImageView imageView, double width, double height) {
         imageView.setViewport(new Rectangle2D(0, 0, width, height));
     }
 
     @FXML
     void imageViewOnMouseClicked(MouseEvent e) {
-        if (data == null) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("CSV Dosyası Seçiniz");
-            alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz CSV Dosyasını Seçiniz");
-            alert.setContentText("Kayıtlar seçtiğiniz CSV dosyasına kaydedilecek");
-
-            alert.showAndWait();
-
-
-        } else if (txtImageName.getText().isEmpty()) {
+        if (txtImageName.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Resim Dosyası Seçiniz");
             alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz Resim Dosyasını Seçiniz");
@@ -613,8 +654,6 @@ public class RecordOverviewController {
             }
             lblX1.setText(String.valueOf(initX));
             lblY1.setText(String.valueOf(initY));
-            System.out.println(lblX1.getText());
-            System.out.println(lblY1.getText());
         }
 
     }
@@ -728,7 +767,7 @@ public class RecordOverviewController {
             alert.showAndWait();
 
 
-        }else if(filteredList == null){
+        } else if (filteredList == null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Herhangi Bir Kayıt Yok");
             alert.setHeaderText("Lütfen Önce Resim Üzerine Tıklayarak Nokta Ekleyiniz");
@@ -736,8 +775,7 @@ public class RecordOverviewController {
 
             alert.showAndWait();
 
-        }
-        else {
+        } else {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("Analiz.fxml"));
                 Parent root1 = loader.load();
@@ -752,6 +790,11 @@ public class RecordOverviewController {
                 e.printStackTrace();
             }
         }
+    }
+
+    @FXML
+    void btnShowAllClick(ActionEvent event) {
+        tableView.setItems(data);
     }
 }
 
