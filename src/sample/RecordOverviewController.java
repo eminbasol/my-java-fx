@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,6 +26,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -32,6 +34,7 @@ import javafx.util.Callback;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.ScrollPane;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -74,7 +77,7 @@ public class RecordOverviewController {
     private Button btnLoadImage;
 
     @FXML
-    private Button btnSave , btnShowAll;
+    private Button btnSave, btnShowAll;
 
     @FXML
     private Button btnAdd;
@@ -128,9 +131,6 @@ public class RecordOverviewController {
     private TextField search;
 
     @FXML
-    private Pane pane;
-
-    @FXML
     private Label lblY1;
 
     @FXML
@@ -141,7 +141,14 @@ public class RecordOverviewController {
 
     @FXML
     private Button btnZoom, btnAnaliz;
-
+    @FXML
+    private Group zoomGroup, rootGroup;
+    @FXML
+    private AnchorPane anchorPane;
+    @FXML
+    private ToggleGroup group1;
+    @FXML
+    private RadioButton radiobtn800, radiobtn1280;
 
     ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
 
@@ -173,59 +180,21 @@ public class RecordOverviewController {
             public ObservableValue<Number> call(TableColumn.CellDataFeatures<Record, Number> recordNumberCellDataFeatures) {
                 return new ReadOnlyObjectWrapper(tableView.getItems().indexOf(recordNumberCellDataFeatures.getValue()) + "");
             }
+        });
 
+        radiobtn800.setToggleGroup(group1);
+        radiobtn1280.setToggleGroup(group1);
+
+        group1.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            public void changed(ObservableValue<? extends Toggle> ob,
+                                Toggle o, Toggle n) {
+
+                RadioButton rb = (RadioButton) group1.getSelectedToggle();
+
+            }
         });
     }
 
-    @FXML
-    void btnUpdateClick(ActionEvent event) {
-        int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
-        Record record1 = new Record(txtFileName.getText(), txtX.getText(), txtY.getText());
-        if (selectedIndex >= 0) {
-            if (filteredList == null) {
-                tableView.getItems().set(selectedIndex, record1);
-            } else {
-                int sourceIndex = filteredList.getSourceIndexFor(data, selectedIndex);
-                data.set(sourceIndex, record1);
-
-                pane.getChildren().clear();
-                pane.getChildren().add(imageView);
-
-                TableColumn<Record, String> column1 = xColumn;
-                List<String> xSutun = new ArrayList<>();
-                for (Record item : tableView.getItems()) {
-                    xSutun.add(column1.getCellObservableValue(item).getValue());
-                }
-                TableColumn<Record, String> column2 = yColumn;
-                List<String> ySutun = new ArrayList<>();
-                for (Record item : tableView.getItems()) {
-                    ySutun.add(column2.getCellObservableValue(item).getValue());
-                }
-                for (int j = 0; j < xSutun.size(); j++) {
-                    Circle spot = new Circle(3);
-                    spot.setFill(Color.RED);
-                    spot.setCenterX(1.0f);
-                    spot.setCenterY(1.0f);
-
-                    spot.setLayoutX(Double.parseDouble(xSutun.get(j)));
-                    spot.setLayoutY(Double.parseDouble(ySutun.get(j)));
-
-                    pane.getChildren().add(spot);
-
-                }
-
-            }
-
-
-        } else {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText("No Record Selected");
-            alert.setContentText("Please select a record in the table.");
-
-            alert.showAndWait();
-        }
-    }
 
     void showRecordInTextFields(Record record) {
         if (record != null) {
@@ -251,9 +220,9 @@ public class RecordOverviewController {
                 int sourceIndex = filteredList.getSourceIndexFor(data, selectedIndex);
                 data.remove(sourceIndex);
                 if (filteredList != null) {
-                    pane.getChildren().clear();
-                    pane.getChildren().add(imageView);
-                    pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
+                    zoomGroup.getChildren().clear();
+                    zoomGroup.getChildren().add(imageView);
+                    //pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
                     TableColumn<Record, String> column1 = xColumn;
                     List<String> xSutun = new ArrayList<>();
                     for (Record item : tableView.getItems()) {
@@ -273,7 +242,7 @@ public class RecordOverviewController {
                         spot.setLayoutX(Double.parseDouble(xSutun.get(j)));
                         spot.setLayoutY(Double.parseDouble(ySutun.get(j)));
 
-                        pane.getChildren().add(spot);
+                        zoomGroup.getChildren().add(spot);
                         lblX1.setText("");
                         lblY1.setText("");
 
@@ -356,8 +325,7 @@ public class RecordOverviewController {
 
         Writer writer = null;
         try {
-            if (file != null)
-            {
+            if (file != null) {
                 File dir = file.getParentFile();
                 fileChooser.setInitialDirectory(dir);
             }
@@ -384,67 +352,6 @@ public class RecordOverviewController {
         txtFileName.setText("");
         txtX.setText("");
         txtY.setText("");
-    }
-
-    @FXML
-    private void btnAddClick(ActionEvent event) {
-
-        if (isInputValid()) {
-            Circle spot = new Circle(3);
-            spot.setFill(Color.RED);
-            spot.setCenterX(1.0f);
-            spot.setCenterY(1.0f);
-
-            spot.setLayoutX(Double.parseDouble(txtX.getText()));
-            spot.setLayoutY(Double.parseDouble(txtY.getText()));
-
-            pane.getChildren().add(spot);
-            pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
-
-            String x = String.valueOf(txtX.getText());
-            String y = String.valueOf(txtY.getText());
-            String fileName = txtImageName.getText();
-            String[] test = fileName.split("/");
-            fileName = test[(test.length) - 1];
-
-            data.add(new Record(fileName, x, y));
-
-            tableView.setItems(filteredList);
-
-            txtFileName.clear();
-            txtY.clear();
-            txtX.clear();
-
-        }
-
-    }
-
-    private boolean isInputValid() {
-        String errorMessage = "";
-
-        if (txtFileName.getText() == null || txtFileName.getText().length() == 0) {
-            errorMessage += "No valid file name!\n";
-        }
-        if (txtX.getText() == null || txtX.getText().length() == 0) {
-            errorMessage += "No valid x!\n";
-        }
-
-        if (txtY.getText() == null || txtY.getText().length() == 0) {
-            errorMessage += "No valid y!\n";
-        }
-
-        if (errorMessage.length() == 0) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Invalid Fields");
-            alert.setHeaderText("Please correct invalid fields");
-            alert.setContentText(errorMessage);
-
-            alert.showAndWait();
-
-            return false;
-        }
     }
 
     @FXML
@@ -501,28 +408,36 @@ public class RecordOverviewController {
 
     private void listViewImageClick() throws IOException {
         imageView.setImage(null);
-        int scaledWidth = 800;
-        int scaledHeight = 600;
+        if(group1.getSelectedToggle() == radiobtn800){
+            int scaledWidth = 800;
+            int scaledHeight = 600;
 
-        String outputPath = txtPath.getText().substring(0,txtPath.getText().indexOf("."));
-        String format = txtPath.getText().substring(txtPath.getText().lastIndexOf("."));
+            String outputPath = txtPath.getText().substring(0, txtPath.getText().indexOf("."));
+            String format = txtPath.getText().substring(txtPath.getText().lastIndexOf("."));
 
-        RecordOverviewController.resize(txtPath.getText(), outputPath+"_resized_800x600"+format, scaledWidth, scaledHeight);
+            RecordOverviewController.resize(txtPath.getText(), outputPath + "_resized_800x600" + format, scaledWidth, scaledHeight);
 
-        Image image = new Image("file:" +outputPath+"_resized_800x600"+format);
-        imageView.setImage(image);
+            Image image = new Image("file:" + outputPath + "_resized_800x600" + format);
+            imageView.setImage(image);
+        }else{
+            int scaledWidth = 1280;
+            int scaledHeight = 720;
 
-        double width = image.getWidth();
-        double height = image.getHeight();
+            String outputPath = txtPath.getText().substring(0, txtPath.getText().indexOf("."));
+            String format = txtPath.getText().substring(txtPath.getText().lastIndexOf("."));
 
-        reset(imageView, width, height);
+            RecordOverviewController.resize(txtPath.getText(), outputPath + "_resized_1280x720" + format, scaledWidth, scaledHeight);
 
-        imageView.fitWidthProperty().bind(pane.widthProperty());
-        imageView.fitHeightProperty().bind(pane.heightProperty());
+            Image image = new Image("file:" + outputPath + "_resized_1280x720" + format);
+            imageView.setImage(image);
+        }
 
-        pane.getChildren().clear();
-        pane.getChildren().add(imageView);
-        pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
+        imageView.setFitHeight(363);
+        imageView.setFitWidth(488);
+
+        zoomGroup.getChildren().clear();
+        zoomGroup.getChildren().add(imageView);
+        //pane.getChildren().addAll(vBoxSlider, btnZoom, btnAnaliz);
         lblX1.setText("");
         lblY1.setText("");
 
@@ -565,7 +480,7 @@ public class RecordOverviewController {
                 spot.setLayoutX(Double.parseDouble(xSutun.get(j)));
                 spot.setLayoutY(Double.parseDouble(ySutun.get(j)));
 
-                pane.getChildren().add(spot);
+                zoomGroup.getChildren().add(spot);
             }
 
         }
@@ -575,7 +490,7 @@ public class RecordOverviewController {
     @FXML
     public void listViewImageClick(MouseEvent click) throws IOException {
         listViewImageClick();
-}
+    }
 
     public static void resize(String inputImagePath,
                               String outputImagePath, int scaledWidth, int scaledHeight)
@@ -596,7 +511,6 @@ public class RecordOverviewController {
 
         ImageIO.write(outputImage, formatName, new File(outputImagePath));
     }
-
 
 
     private void reset(ImageView imageView, double width, double height) {
@@ -622,10 +536,10 @@ public class RecordOverviewController {
             spot.setLayoutX(e.getX());
             spot.setLayoutY(e.getY());
 
-            pane.getChildren().add(spot);
+            zoomGroup.getChildren().add(spot);
 
-            String x = String.valueOf(e.getX());
-            String y = String.valueOf(e.getY());
+            String x = String.format("%.5s",e.getX());
+            String y = String.format("%.5s",e.getY());
             String fileName = txtImageName.getText();
             String[] test = fileName.split("/");
             fileName = test[(test.length) - 1];
@@ -650,7 +564,7 @@ public class RecordOverviewController {
                 line.setFill(null);
                 line.setStroke(Color.RED);
                 line.setStrokeWidth(2);
-                pane.getChildren().add(line);
+                zoomGroup.getChildren().add(line);
             }
             lblX1.setText(String.valueOf(initX));
             lblY1.setText(String.valueOf(initY));
@@ -659,102 +573,15 @@ public class RecordOverviewController {
     }
 
     @FXML
-    void imageViewOnMouseDragged(MouseEvent event) {
-        if (data != null && !txtImageName.getText().isEmpty()) {
-            Point2D dragPoint = imageViewToImage(imageView, new Point2D(event.getX(), event.getY()));
-            shift(imageView, dragPoint.subtract(mouseDown.get()));
-            mouseDown.set(imageViewToImage(imageView, new Point2D(event.getX(), event.getY())));
-        }
-    }
-
-    @FXML
-    void imageViewOnMousePressed(MouseEvent event) {
-        if (data != null && !txtImageName.getText().isEmpty()) {
-            Point2D mousePress = imageViewToImage(imageView, new Point2D(event.getX(), event.getY()));
-            mouseDown.set(mousePress);
-        }
-
-    }
-
-    public Point2D imageViewToImage(ImageView imageView, Point2D imageViewCoordinates) {
-        double xProportion = imageViewCoordinates.getX() / imageView.getBoundsInLocal().getWidth();
-        double yProportion = imageViewCoordinates.getY() / imageView.getBoundsInLocal().getHeight();
-
-        Rectangle2D viewport = imageView.getViewport();
-        return new Point2D(
-                viewport.getMinX() + xProportion * viewport.getWidth(),
-                viewport.getMinY() + yProportion * viewport.getHeight());
-    }
-
-    public double clamp(double value, double min, double max) {
-
-        if (value < min)
-            return min;
-        if (value > max)
-            return max;
-        return value;
-    }
-
-    public void shift(ImageView imageView, Point2D delta) {
-        Rectangle2D viewport = imageView.getViewport();
-
-        double width = imageView.getImage().getWidth();
-        double height = imageView.getImage().getHeight();
-
-        double maxX = width - viewport.getWidth();
-        double maxY = height - viewport.getHeight();
-
-        double minX = clamp(viewport.getMinX() - delta.getX(), 0, maxX);
-        double minY = clamp(viewport.getMinY() - delta.getY(), 0, maxY);
-
-        imageView.setViewport(new Rectangle2D(minX, minY, viewport.getWidth(), viewport.getHeight()));
-    }
-
-
-    @FXML
-    public void imageViewOnScroll(ScrollEvent e) {
-        if (data != null && !txtImageName.getText().isEmpty()) {
-            double delta = e.getDeltaY();
-            Rectangle2D viewport = imageView.getViewport();
-
-
-            double width = imageView.getImage().getWidth();
-
-            double height = imageView.getImage().getHeight();
-
-
-            double scale = clamp(Math.pow(1.01, delta),
-                    Math.min(MIN_PIXELS / viewport.getWidth(), MIN_PIXELS / viewport.getHeight()),
-                    Math.max(width / viewport.getWidth(), height / viewport.getHeight())
-            );
-
-            Point2D mouse = imageViewToImage(imageView, new Point2D(e.getX(), e.getY()));
-            double newWidth = viewport.getWidth() * scale;
-            double newHeight = viewport.getHeight() * scale;
-
-            double newMinX = clamp(mouse.getX() - (mouse.getX() - viewport.getMinX()) * scale,
-                    0, width - newWidth);
-            double newMinY = clamp(mouse.getY() - (mouse.getY() - viewport.getMinY()) * scale,
-                    0, height - newHeight);
-
-            imageView.setViewport(new Rectangle2D(newMinX, newMinY, newWidth, newHeight));
-        }
-    }
-
-    @FXML
     void btnZoomClick(ActionEvent event) {
-        imageView.setImage(null);
-        Image image = new Image("file:" + txtPath.getText());
-        imageView.setImage(image);
-
-
-        imageView.scaleXProperty().bind(slider.valueProperty());
-        imageView.scaleYProperty().bind(slider.valueProperty());
-
-
-        imageView.setViewport(new Rectangle2D(0, 0, image.getWidth(), image.getHeight()));
-
+        zoomSlider();
     }
+
+    private void zoomSlider() {
+        zoomGroup.setScaleX(slider.getValue());
+        zoomGroup.setScaleY(slider.getValue());
+    }
+
 
     @FXML
     private void btnAnalizClick(ActionEvent event) {
@@ -783,8 +610,9 @@ public class RecordOverviewController {
                 AnalizController analizController = loader.getController();
                 analizController.setData(filteredList);
 
+                analizController.buttonClick();
                 Stage stage = new Stage();
-                stage.setScene(new Scene(root1, 300, 300));
+                stage.setScene(new Scene(root1, 540, 290));
                 stage.show();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -792,22 +620,23 @@ public class RecordOverviewController {
         }
     }
 
+
+    private double scale = 1;
+
+    @FXML
+    public void scrolling(ScrollEvent scrollEvent) {
+        if (scrollEvent.getDeltaY() > 0) {
+            scale += 0.1;
+        } else if (scrollEvent.getDeltaY() < 0) {
+            scale -= 0.1;
+        }
+        zoomGroup.setScaleX(scale);
+        zoomGroup.setScaleY(scale);
+    }
+
     @FXML
     void btnShowAllClick(ActionEvent event) {
         tableView.setItems(data);
     }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
