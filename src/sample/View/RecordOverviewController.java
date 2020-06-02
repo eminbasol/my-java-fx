@@ -1,4 +1,4 @@
-package sample;
+package sample.View;
 
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,21 +27,24 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import sample.Model.Record;
+import sample.Util.VeriTabaniUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.ScrollPane;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -72,75 +76,46 @@ public class RecordOverviewController {
 
     @FXML
     private Button btnLoadCsv;
-
     @FXML
     private Button btnLoadImage;
-
     @FXML
     private Button btnSave, btnShowAll;
-
-    @FXML
-    private Button btnAdd;
-
     @FXML
     private Button btnDelete;
-
-    @FXML
-    private Button btnUpdate;
-
     @FXML
     private TextField txtX;
-
     @FXML
     private TextField txtY;
-
     @FXML
     private TextField txtFileName;
-
     @FXML
     private CheckBox boxId;
-
     @FXML
     private CheckBox boxFileName;
-
     @FXML
     private CheckBox boxX;
-
     @FXML
     private CheckBox boxY;
-
     @FXML
     private TextField srcInput;
-
     @FXML
     private ListView<String> listView;
-
-    @FXML
-    private VBox vBox, vBoxSlider;
-
     @FXML
     private TextField txtPath;
-
     @FXML
     private TextField txtImageName;
-
     @FXML
     private ImageView imageView;
-
     @FXML
     private TextField search;
-
     @FXML
     private Label lblY1;
-
     @FXML
     private Label lblX1;
-
     @FXML
     private Slider slider;
-
     @FXML
-    private Button btnZoom, btnAnaliz;
+    private Button btnZoom, btnAnaliz, btnSignOut;
     @FXML
     private Group zoomGroup, rootGroup;
     @FXML
@@ -149,6 +124,10 @@ public class RecordOverviewController {
     private ToggleGroup group1;
     @FXML
     private RadioButton radiobtn800, radiobtn1280;
+    @FXML
+    private Label lblUsernamePass;
+    @FXML
+    private Button btnAllData;
 
     ObjectProperty<Point2D> mouseDown = new SimpleObjectProperty<>();
 
@@ -159,6 +138,20 @@ public class RecordOverviewController {
     public ObservableList<Record> data;
 
     public FilteredList filteredList;
+
+    String sql = "";
+    Connection baglanti = null;
+    PreparedStatement sorguIfadesi = null;
+    ResultSet getirilen = null;
+
+    public RecordOverviewController() {
+        baglanti = VeriTabaniUtil.Baglan();
+    }
+
+    public void setlblUsernamePass(String username) {
+
+        lblUsernamePass.setText(username);
+    }
 
     @FXML
     public void initialize() {
@@ -284,8 +277,9 @@ public class RecordOverviewController {
                 String fileName = scan.next();
                 String x = scan.next();
                 String y = scan.next();
+                String username = scan.next();
 
-                data.add(new Record(fileName, x, y));
+                data.add(new Record(fileName, x, y, username));
                 tableView.setItems(data);
 
                 ıdColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Record, Number>, ObservableValue<Number>>() {
@@ -323,35 +317,46 @@ public class RecordOverviewController {
         fileChooser.setInitialFileName(defaultSaveName);
         File file = fileChooser.showSaveDialog(null);
 
-        Writer writer = null;
-        try {
-            if (file != null) {
+        if (file != null) {
+
+            sql = "Insert into Record (filename,x, y, username) values (?,?,?,?)";
+
+            Writer writer = null;
+            try {
                 File dir = file.getParentFile();
                 fileChooser.setInitialDirectory(dir);
-            }
-            writer = new BufferedWriter(new FileWriter(file));
-            for (Record record : data) {
+                writer = new BufferedWriter(new FileWriter(file));
+                for (Record record : data) {
+                    sorguIfadesi = baglanti.prepareStatement(sql);
+                    sorguIfadesi.setString(1, record.getFileName());
+                    sorguIfadesi.setString(2, record.getX());
+                    sorguIfadesi.setString(3, record.getY());
+                    sorguIfadesi.setString(4, record.getUsername());
+                    sorguIfadesi.executeUpdate();
 
-                String text = "," + record.getFileName() + "," + record.getX() + "," + record.getY();
-                writer.write(text);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
+                    String text = "," + record.getFileName() + "," + record.getX() + "," + record.getY() + "," + record.getUsername();
+                    writer.write(text);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            } finally {
 
-            writer.flush();
-            writer.close();
+                writer.flush();
+                writer.close();
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText("Saved CSV File and Added Database");
+            alert.showAndWait();
+
+            txtFileName.setText("");
+            txtX.setText("");
+            txtY.setText("");
+        } else {
+            System.out.println("Dosya Kaydedilmedi");
         }
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information Dialog");
-        alert.setHeaderText(null);
-        alert.setContentText("Data Saved");
-        alert.showAndWait();
-
-        txtFileName.setText("");
-        txtX.setText("");
-        txtY.setText("");
     }
 
     @FXML
@@ -397,18 +402,20 @@ public class RecordOverviewController {
 
                             }
                         });
+
+                listView.getSelectionModel().select(0);
+                listViewImageClick();
             }
         } else {
             System.out.println("File is not Valid");
         }
 
-        listView.getSelectionModel().select(0);
-        listViewImageClick();
+
     }
 
     private void listViewImageClick() throws IOException {
         imageView.setImage(null);
-        if(group1.getSelectedToggle() == radiobtn800){
+        if (group1.getSelectedToggle() == radiobtn800) {
             int scaledWidth = 800;
             int scaledHeight = 600;
 
@@ -419,7 +426,7 @@ public class RecordOverviewController {
 
             Image image = new Image("file:" + outputPath + "_resized_800x600" + format);
             imageView.setImage(image);
-        }else{
+        } else {
             int scaledWidth = 1280;
             int scaledHeight = 720;
 
@@ -538,13 +545,14 @@ public class RecordOverviewController {
 
             zoomGroup.getChildren().add(spot);
 
-            String x = String.format("%.5s",e.getX());
-            String y = String.format("%.5s",e.getY());
+            String x = String.format("%.5s", e.getX());
+            String y = String.format("%.5s", e.getY());
             String fileName = txtImageName.getText();
             String[] test = fileName.split("/");
             fileName = test[(test.length) - 1];
+            String username = lblUsernamePass.getText();
 
-            data.add(new Record(fileName, x, y));
+            data.add(new Record(fileName, x, y, username));
 
             tableView.setItems(filteredList);
 
@@ -637,6 +645,41 @@ public class RecordOverviewController {
     @FXML
     void btnShowAllClick(ActionEvent event) {
         tableView.setItems(data);
+    }
+
+    @FXML
+    void btnSignOutClick(ActionEvent event) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
+        Parent rootNode = loader.load();
+        Stage stage = new Stage();
+        stage.setTitle("Login");
+        stage.setScene(new Scene(rootNode, 800, 450));
+        stage.setResizable(false);
+        stage.show();
+
+        Node source = (Node) event.getSource();
+        Stage primaryStage = (Stage) source.getScene().getWindow();
+        primaryStage.close();
+
+    }
+
+    @FXML
+    void btnAllDataClick(ActionEvent event) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("AllData.fxml"));
+        Parent root1 = loader.load();
+
+        AllDataController allDataController = loader.getController();
+        allDataController.setlblUsernamePass(lblUsernamePass.getText());
+
+        allDataController.DegerleriGetir();
+
+
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root1, 400, 400));
+        stage.show();
+
     }
 
 }

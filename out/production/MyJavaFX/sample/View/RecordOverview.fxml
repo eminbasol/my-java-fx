@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.RecordOverviewController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.View.RecordOverviewController">
     <children>
         <SplitPane dividerPositions="0.17195325542570952, 0.6043405676126878" layoutX="176.0" prefHeight="420.0" prefWidth="1148.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <items>
@@ -55,13 +55,16 @@
                   </Group>
                         <Label fx:id="lblY1" visible="false" />
                         <Label fx:id="lblX1" visible="false" />
-                        <Button fx:id="btnAnaliz" layoutX="361.0" layoutY="396.0" mnemonicParsing="false" onAction="#btnAnalizClick" prefHeight="25.0" prefWidth="54.0" text="Analiz" AnchorPane.bottomAnchor="5.0" />
-                        <Button fx:id="btnZoom" layoutX="426.0" layoutY="396.0" mnemonicParsing="false" onAction="#btnZoomClick" prefHeight="25.0" prefWidth="51.0" text="Zoom" AnchorPane.bottomAnchor="5.0" />
-                  <Slider fx:id="slider" layoutX="143.0" layoutY="396.0" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="10" showTickMarks="true" value="1.0" AnchorPane.bottomAnchor="1.0" />
+                        <Button fx:id="btnAnaliz" layoutX="431.0" layoutY="392.0" mnemonicParsing="false" onAction="#btnAnalizClick" prefHeight="25.0" prefWidth="65.0" style="-fx-background-radius: 5;" text="Analysis" AnchorPane.bottomAnchor="1.0" />
+                        <Button fx:id="btnZoom" layoutX="369.0" layoutY="392.0" mnemonicParsing="false" onAction="#btnZoomClick" prefHeight="25.0" prefWidth="51.0" style="-fx-background-radius: 5;" text="Zoom" AnchorPane.bottomAnchor="1.0" />
+                  <Slider fx:id="slider" layoutX="212.0" layoutY="392.0" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="10" showTickMarks="true" value="1.0" AnchorPane.bottomAnchor="1.0" />
+                  <Button fx:id="btnSignOut" layoutX="14.0" layoutY="392.0" mnemonicParsing="false" onAction="#btnSignOutClick" prefHeight="25.0" prefWidth="65.0" style="-fx-background-radius: 5;" text="Sign Out" />
+                  <Button fx:id="btnAllData" layoutX="96.0" layoutY="392.0" mnemonicParsing="false" onAction="#btnAllDataClick" prefHeight="25.0" prefWidth="65.0" style="-fx-background-radius: 5;" text="All Data" />
                </children>
             </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="418.0" prefWidth="491.0">
                     <children>
+                  <Label fx:id="lblUsernamePass" visible="false" />
                         <VBox prefHeight="493.0" prefWidth="783.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
                                 <TableView fx:id="tableView" prefHeight="353.0" prefWidth="474.0">
@@ -95,10 +98,10 @@
                                     <ToggleGroup fx:id="group1" />
                                  </toggleGroup></RadioButton>
                               <RadioButton fx:id="radiobtn1280" mnemonicParsing="false" prefHeight="75.0" prefWidth="80.0" text="1280x720" toggleGroup="$group1" />
-                                        <Button fx:id="btnLoadImage" mnemonicParsing="false" onAction="#btnLoadImageClick" prefHeight="75.0" prefWidth="86.0" text="Load Images" />
-                                        <Button fx:id="btnLoadCsv" mnemonicParsing="false" onAction="#btnLoadCsvClick" prefHeight="75.0" prefWidth="80.0" text="Load CSV" />
-                                        <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDeleteClick" prefHeight="75.0" prefWidth="80.0" text="Delete" />
-                                        <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSaveClicked" prefHeight="75.0" prefWidth="80.0" text="Save" />
+                                        <Button fx:id="btnLoadImage" mnemonicParsing="false" onAction="#btnLoadImageClick" prefHeight="75.0" prefWidth="86.0" style="-fx-background-radius: 5;" text="Load Images" />
+                                        <Button fx:id="btnLoadCsv" mnemonicParsing="false" onAction="#btnLoadCsvClick" prefHeight="75.0" prefWidth="80.0" style="-fx-background-radius: 5;" text="Load CSV" />
+                                        <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDeleteClick" prefHeight="75.0" prefWidth="80.0" style="-fx-background-radius: 5;" text="Delete" />
+                                        <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSaveClicked" prefHeight="75.0" prefWidth="80.0" style="-fx-background-radius: 5;" text="Save" />
                                     </children>
                                 </HBox>
                             </children>
