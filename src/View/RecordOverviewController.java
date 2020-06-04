@@ -708,7 +708,7 @@ public class RecordOverviewController {
                 String[] test = fileName.split("/");
                 fileName = test[(test.length) - 1];
 
-                final String ACCESS_TOKEN = "u8niALod3VAAAAAAAAAAWWInerjXFpr37MGgx4k1IrxC9xHkI6ak7OD4AuGaISfH";
+                final String ACCESS_TOKEN = "u8niALod3VAAAAAAAAAAWqFtMalMT72vhkZyUfAtZhWX1UIuscCE8IcRfDLQBB9T";
 
                 DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial", "en_US");
                 DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);

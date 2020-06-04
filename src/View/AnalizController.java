@@ -2,7 +2,9 @@ package View;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -10,6 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import Model.Record;
 import Model.Uzaklıklar;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -191,5 +194,12 @@ public class AnalizController {
         }
 
         lblMod.setText(String.valueOf(mode));
+    }
+
+    @FXML
+    void btnCancelClick(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Stage primaryStage = (Stage) source.getScene().getWindow();
+        primaryStage.close();
     }
 }
