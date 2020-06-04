@@ -116,7 +116,7 @@ public class AllDataController {
 
         } else {
 
-            final String ACCESS_TOKEN = "u8niALod3VAAAAAAAAAAWqFtMalMT72vhkZyUfAtZhWX1UIuscCE8IcRfDLQBB9T";
+            final String ACCESS_TOKEN = "u8niALod3VAAAAAAAAAAYrKIdfX2wFDPCVymIfgjNHaY2zwtNuQrp9WjmnI9t_Zf";
 
             DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial", "en_US");
             DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
@@ -136,6 +136,7 @@ public class AllDataController {
                     try {
                         client.files().downloadBuilder("/" + lblUsername.getText() + "/" + fileName)
                                 .download(downloadFile);
+
                     } finally {
                         downloadFile.close();
                     }
@@ -143,6 +144,7 @@ public class AllDataController {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setHeaderText("Unable to download file to local system\n Error:" + e);
                     alert.showAndWait();
+                    e.printStackTrace();
                 } catch (IOException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setHeaderText("Unable to download file to local system\n Error: " + e);
