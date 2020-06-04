@@ -116,7 +116,7 @@ public class AllDataController {
 
         } else {
 
-            final String ACCESS_TOKEN = "u8niALod3VAAAAAAAAAAWPnbP8ESOy3Mgrcib1A-cNMU6MuuxApK7jJ93iMbcGUc";
+            final String ACCESS_TOKEN = "u8niALod3VAAAAAAAAAAWWInerjXFpr37MGgx4k1IrxC9xHkI6ak7OD4AuGaISfH";
 
             DbxRequestConfig config = new DbxRequestConfig("dropbox/java-tutorial", "en_US");
             DbxClientV2 client = new DbxClientV2(config, ACCESS_TOKEN);
