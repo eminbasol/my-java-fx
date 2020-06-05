@@ -512,7 +512,17 @@ public class RecordOverviewController {
 
     @FXML
     public void listViewImageClick(MouseEvent click) throws IOException {
-        listViewImageClick();
+        if(listView.getSelectionModel().getSelectedItem() != null){
+            listViewImageClick();
+        }else{
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Resim Dosyası Yükleyiniz");
+            alert.setHeaderText("Lütfen Önce Kullanmak İstediğiniz Resim Dosyalarını Yükleyiniz");
+            alert.setContentText("İşaretlemeler Resim Üzerinde Yapılacaktır");
+
+            alert.showAndWait();
+        }
+
     }
 
     public static void resize(String inputImagePath,
